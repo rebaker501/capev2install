@@ -50,10 +50,13 @@ Let's talk about hardware. I've run the install on a 2U Dell Server from 2021 wi
 This is where the instructions incorporate my experience. Would like to give a shout out to Victor Batiz for the assist on some of this. Always nice to have someone else to help from time to time. 
 
  1. Let get some packages installed. You can omit openssh-server and vim if you don't want those. I found that if I didn't do this, pyre2 would fail every time during the cape2.sh script that we execute later.
- `sudo apt-get install -y git build-essential cmake ninja-build python3-dev cython3 pybind11-dev python3-pip libre2-dev vim openssh-server acpica-tools `
+ `sudo apt-get install -y git build-essential cmake ninja-build python3-dev cython3 pybind11-dev python3-pip libre2-dev vim openssh-server acpica-tools net-tools`
  
  2. Once step 1 completes, let's get our KVM installer downloaded.
- 3. `wget https://raw.githubusercontent.com/doomedraven/Tools/blob/master/Virtualization/kvm-qemu.sh`
+ 3. From a terminal:
+
+    `wget https://raw.githubusercontent.com/doomedraven/Tools/master/Virtualization/kvm-qemu.sh`
+
  4. This file will need to be edited with some hardware information. I think this is right, but if it's not, please feel free to put in an issue and give us the assist. Documentation was not good regarding this, so hours upon hours where spent. Here's how I got the data I believe is correct to replace WOOT within the kvm-qemu script. Run the following commands. I recommend doing this from a temp folder you can create in your home directory. Once again, this is my estimation of what to do as the instructions literally say to Google it.
  5. `sudo acpidump > acpidump.out`
  6. `sudo acpixtract -a acpidump.out`
@@ -85,13 +88,13 @@ In this section we install CAPEv2. The installer will need to be edited a little
  9. Once rebooted, there is one more hurdle. This one took me a while to figure out. It was buried in the issues section of the Github repository. The database doesn't have proper permissions by default, so this will correct that.
  10. From the Terminal `sudo -u postgres psql`
  11. `ALTER DATABASE cape OWNER TO cape;`
- 12. `exit` 
- 13. `cd /opt/CAPE`
+ 12. `\q` 
+ 13. `cd /opt/CAPEvw`
  14.  Run `sudo journalctl -u cape.service`. This will show the log for the CAPE service. My first try showed that some dependencies were missing. Yours may vary, but this is what I had to do next.
  15. `poetry run pip3 install https://github.com/CAPESandbox/peepdf/archive/20eda78d7d77fc5b3b652ffc2d8a5b0af796e3dd.zip#egg=peepdf==0.4.2`
  16. `poetry run pip3 install -U git+https://github.com/DissectMalware/batch_deobfuscator`
  17. `poetry run pip3 install -U git+https://github.com/CAPESandbox/httpreplay`
- 18. Work through that until you get no errors from journalctl. You might have to restart the service. The other cape services can be found by typing journalctl -u cape and hitting tab a couple of times. This will list out the other services. You'll need to look at these to figure out if anything is wrong.
+ 18. Work through that until you get no errors from journalctl. You might have to restart the service. The other cape services can be found by typing journalctl -u cape and hitting tab a couple of times. This will list out the other services. You'll need to look at these to figure out if anything is wrong. In your routing.conf you'll need the tor line to reflect what interface KVM is attached to, in my case virbr0.
 ## Build an Analysis VM
 
 We will need a virtual machine build for analyzing malware samples. A Windows 10 VM will work. You can use Windows 7, Windows 10, Windows 11, Windows Server, Linux, etc. Let's start with one. Disabling the services on Windows 10 is a bit of a pain, but I've found some good scripts to automate the process. You'll need a Windows 10 license and I strongly suggest a copy of MS Office (2019 or 2016 is just fine). The new version (365) might be too chatty on the network. Some people suggest 4GB of RAM for the VMs but I use 8GB. Also, never use less than 2 cores or CPUs. No devices in the past 10 years are single core and malware might look for that. Let's start.
@@ -160,3 +163,5 @@ We will need a virtual machine build for analyzing malware samples. A Windows 10
 
 
 ## WORK IN PROGRESS....
+
+
